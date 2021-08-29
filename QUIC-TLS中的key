@@ -1,0 +1,30 @@
+
+       Client                                             Server
+
+       ClientHello
+      (0-RTT Application Data)  -------->
+                                                     ServerHello
+                                            {EncryptedExtensions}
+                                                       {Finished}
+                                <--------      [Application Data]
+      {Finished}                -------->
+
+      [Application Data]        <------->      [Application Data]
+
+       () Indicates messages protected by Early Data (0-RTT) Keys
+       {} Indicates messages protected using Handshake Keys
+       [] Indicates messages protected using Application Data
+          (1-RTT) Keys
+          
+   Data is protected using a number of encryption levels:
+
+   *  Initial keys
+
+   *  Early data (0-RTT) keys
+      0-RTT自己产生的key，用于(0-RTT Application Data)的保护
+
+   *  Handshake keys
+      在握手过程中保护握手数据的密钥，TLS1.3中ServerHello以后的数据均是由handshake key加密的
+
+   *  Application data (1-RTT) keys
+      握手完成协商出来的密钥，用于加密后续应用数据
