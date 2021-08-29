@@ -1,0 +1,47 @@
+
+
+   +--------------+--------------+ +-------------+
+   |     TLS      |     TLS      | |    QUIC     |
+   |  Handshake   |    Alerts    | | Applications|
+   |              |              | |  (h3, etc.) |
+   +--------------+--------------+-+-------------+
+   |                                             |
+   |                QUIC Transport               |
+   |   (streams, reliability, congestion, etc.)  |
+   |                                             |
+   +---------------------------------------------+
+   |                                             |
+   |            QUIC Packet Protection           |
+   |                                             |
+   +---------------------------------------------+
+
+                           Figure 3: QUIC Layers
+
+* TLS负责认证和重要参数的协商（安全和性能相关）
+* QUIC负责可靠性，有序交付和记录层
+
+QUIC和TLS两个主要的交互：
+1. TLS通过QUIC组件send和receive消息，QUIC为TLS提供可靠的流抽象
+2. TLS向QUIC组件提供一系列的更新，如需要安装的新的packet protection keys，状态改变（握手完成，服务器证书等）
+
+   +------------+                               +------------+
+   |            |<---- Handshake Messages ----->|            |
+   |            |<- Validate 0-RTT Parameters ->|            |
+   |            |<--------- 0-RTT Keys ---------|            |
+   |    QUIC    |<------- Handshake Keys -------|    TLS     |
+   |            |<--------- 1-RTT Keys ---------|            |
+   |            |<------- Handshake Done -------|            |
+   +------------+                               +------------+
+    |         ^
+    | Protect | Protected
+    v         | Packet
+   +------------+
+   |   QUIC     |
+   |  Packet    |
+   | Protection |
+   +------------+
+
+                    Figure 4: QUIC and TLS Interactions
+                    
+NOTE: 和基于TCP的TLS不同，QUIC不通过TLS application data records发送数据，
+      它通过QUIC STREAM frame或者其他frame发送，这些都包含在QUIC packet中。
